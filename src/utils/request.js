@@ -1,11 +1,19 @@
 import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
+import {
+  MessageBox,
+  Message
+} from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
-
+import {
+  getToken
+} from '@/utils/auth'
+import router from '@/router'
+import {
+  Notification
+} from 'element-ui';
 // create an axios instance
 const service = axios.create({
-  baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
+  baseURL: '', // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 5000 // request timeout
 })
@@ -35,7 +43,7 @@ service.interceptors.response.use(
   /**
    * If you want to get http information such as headers or status
    * Please return  response => response
-  */
+   */
 
   /**
    * Determine the request status by custom code
@@ -43,41 +51,54 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   response => {
+    console.log(response.data)
     const res = response.data
-
     // if the custom code is not 20000, it is judged as an error.
-    if (res.code !== 20000) {
-      Message({
-        message: res.message || 'Error',
-        type: 'error',
-        duration: 5 * 1000
-      })
 
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-        // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-          confirmButtonText: 'Re-Login',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
-        }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
-        })
-      }
+    if (response.status !== 200 || res.status !== 0) {
+      Notification({
+        title: '系统异常',
+        message: res.message,
+        type: 'error'
+      });
+
       return Promise.reject(new Error(res.message || 'Error'))
     } else {
       return res
     }
   },
   error => {
-    console.log('err' + error) // for debug
-    Message({
-      message: error.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+    const notify = Notification
+    switch (error.response.status) {
+      case 403:
+        notify({
+          title: '警告',
+          message: '你没有权限访问',
+          type: 'warning'
+        });
+        router.push('/error/401')
+        break;
+      case 404:
+        router.push('/error/404')
+        break;
+      case 401:
+        notify({
+          title: '警告',
+          message: '你还没登录,请重新登录',
+          type: 'warning'
+        });
+        store.dispatch('user/resetToken').then(() => {
+          location.reload()
+        })
+        break;
+      default:
+        notify({
+          title: '错误(debug)',
+          message: error,
+          type: 'error'
+        });
+    }
+
     return Promise.reject(error)
   }
 )
