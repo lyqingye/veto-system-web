@@ -1,20 +1,20 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
+    <el-form ref="registerForm" :model="registerForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
         <h3 class="title">Login Form</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="mobile">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
+          ref="mobile"
+          v-model="registerForm.mobile"
+          placeholder="mobile"
+          name="mobile"
           type="text"
           tabindex="1"
           autocomplete="on"
@@ -29,7 +29,7 @@
           <el-input
             :key="passwordType"
             ref="password"
-            v-model="loginForm.password"
+            v-model="registerForm.password"
             :type="passwordType"
             placeholder="Password"
             name="password"
@@ -45,41 +45,29 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-form-item prop="verifyCode">
+      <el-form-item >
         <span class="svg-container">
           <svg-icon icon-class="lock" />
         </span>
         <el-input
           ref="verifyCode"
-          v-model="loginForm.verifyCode"
+          v-model="registerForm.extra.verifyCode"
           placeholder="verifyCode"
           name="verifyCode"
           type="text"
           tabindex="3"
           autocomplete="on"
-          style="width: 50%;"
+          style="width: 80%;"
         />
-        <img :src="'/api/web/verifyCode/' + loginForm.randomCode" style="float: right;" @click="refreshVerifyCode">
+        <span class="svg-container" style="float: right;margin-right: 12px;" @click="sendVerifyCode">
+          <i v-if="canSendVerifyCode" class="el-icon-refresh" />
+          <i v-if="!canSendVerifyCode" class="el-icon-loading" />
+        </span>
+        <!-- <img :src="'/api/web/verifyCode/' + loginForm.randomCode" style="float: right;" @click="refreshVerifyCode"> -->
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">register</el-button>
 
-      <div style="position:relative">
-
-        <router-link to="/register" style="float: right;color: white;">没有账号？前往注册</router-link>
-        <!-- <div class="tips">
-          <span>Username : admin</span>
-          <span>Password : any</span>
-        </div>
-        <div class="tips">
-          <span style="margin-right:18px;">Username : editor</span>
-          <span>Password : any</span>
-        </div> -->
-
-        <!-- <el-button class="thirdparty-button" type="primary" @click="showDialog=true">
-          Or connect with
-        </el-button> -->
-      </div>
     </el-form>
 
     <el-dialog title="Or connect with" :visible.sync="showDialog">
@@ -94,7 +82,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
-
+import { sendRegisterVerifyCode,register } from '@/api/user'
 export default {
   name: 'Login',
   data() {
@@ -113,14 +101,18 @@ export default {
       }
     }
     return {
-      loginForm: {
-        username: '17687647684',
+      timer: null,
+      timerCount: 0,
+      canSendVerifyCode: true,
+      registerForm: {
+        mobile: '17687647684',
         password: '123456',
-        verifyCode: '',
-        randomCode: ''
+        extra: {
+          verifyCode: ''
+        }
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        mobile: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       passwordType: 'password',
@@ -144,13 +136,13 @@ export default {
     }
   },
   created() {
-    this.refreshVerifyCode()
+    // this.refreshVerifyCode()
     // window.addEventListener('storage', this.afterQRScan)
   },
   mounted() {
-    if (this.loginForm.username === '') {
-      this.$refs.username.focus()
-    } else if (this.loginForm.password === '') {
+    if (this.registerForm.mobile === '') {
+      this.$refs.mobile.focus()
+    } else if (this.registerForm.password === '') {
       this.$refs.password.focus()
     }
   },
@@ -182,18 +174,21 @@ export default {
       })
     },
     handleLogin() {
-      this.$refs.loginForm.validate(valid => {
+      this.$refs.registerForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
-            .then(() => {
-              this.$router.push({ path: '/home', query: this.otherQuery })
+          register(this.registerForm).then(resp => {
+            if(resp.status === 0) {
+              this.$message('注册成功,正在为你跳到登录页')
+              this.$router.push({ path: '/login', query: this.otherQuery })
               this.loading = false
-            })
-            .catch(() => {
-              this.refreshVerifyCode()
-              this.loading = false
-            })
+            }else {
+              this.$message(resp.message)
+
+            }
+
+          })
+          this.loading = false
         } else {
           console.log('error submit!!')
           return false
@@ -208,9 +203,31 @@ export default {
         return acc
       }, {})
     },
-
-    refreshVerifyCode() {
-      this.loginForm.randomCode = Math.floor(Math.random() * 1000000000000 + 1000000000000)
+    sendVerifyCode() {
+      if (this.canSendVerifyCode === true) {
+        sendRegisterVerifyCode(this.registerForm.mobile).then(resp => {
+          if (resp.status === 0) {
+            this.$message('验证码发送成功')
+            this.canSendVerifyCode = false
+            const me = this
+            if (me.timer == null) {
+              me.timerCount = 60
+              me.timer = setInterval(function() {
+                me.timerCount--
+                if (me.timerCount <= 0) {
+                  me.canSendVerifyCode = true
+                  clearInterval(me.timer)
+                  me.timer = null
+                }
+              }, 1000)
+            }
+          } else {
+            this.$message('验证码发送失败')
+          }
+        }).catch(error => {
+          console.log(error)
+        })
+      }
     }
     // afterQRScan() {
     //   if (e.key === 'x-admin-oauth-code') {

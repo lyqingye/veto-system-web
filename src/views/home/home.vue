@@ -12,7 +12,7 @@
               <div class="avatar-wrapper">
                 <el-row>
                   <el-col :span="12">
-                    <el-avatar size="50" shape="square" src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif"></el-avatar>
+                    <el-avatar shape="square" src="https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif" />
                   </el-col>
                   <el-col :span="12">
                     <div style="float: right;margin-left: 2px;">
@@ -138,6 +138,16 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+export default {
+  methods: {
+
+    async logout() {
+      await this.$store.dispatch('user/logout')
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    }
+  }
+}
 </script>
 
 <style>

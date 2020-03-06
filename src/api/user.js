@@ -8,6 +8,14 @@ export function login(data) {
   })
 }
 
+export function register(data) {
+  return request({
+    url: '/api/web/member/register',
+    method: 'post',
+    data
+  })
+}
+
 export function getInfo(token) {
   return request({
     url: '/api/web/member/getLoginUserInfo',
@@ -19,5 +27,12 @@ export function logout() {
   return request({
     url: '/logout',
     method: 'post'
+  })
+}
+
+export function sendRegisterVerifyCode(mobile) {
+  return request({
+    url: '/api/web/member/sms/sendRegisterVerifyCode/' + mobile,
+    method: 'get'
   })
 }
