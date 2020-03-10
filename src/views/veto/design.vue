@@ -119,12 +119,12 @@
                     <el-button size="mini" @click="editSubject(index,subject)">编辑</el-button>
                     <el-button size="mini" @click="deleteSubject(index,subject)" :disabled="edittingSubjectIndex != index">删除</el-button>
                   </div>
-                   <el-checkbox-group v-model="subject.answer" v-if="subject.selectType === 'multiple'"
+                   <el-checkbox-group  v-if="subject.selectType === 'multiple'"
                    @change="subjectAlert(subject)">
                        <el-checkbox :label="opIndex" v-for="(option,opIndex) in subject.options">{{option.title}}</el-checkbox>
                    </el-checkbox-group>
 
-                    <el-radio-group v-model="subject.answer" v-if="subject.selectType === 'single'"
+                    <el-radio-group  v-if="subject.selectType === 'single'"
                     @change="subjectAlert(subject)">
                        <el-radio :label="opIndex" v-for="(option,opIndex) in subject.options">{{option.title}}</el-radio>
                     </el-radio-group>
@@ -135,7 +135,7 @@
         </el-main>
       </el-container>
       <el-footer style="text-align: right; margin-top: 0%;">
-        <el-button type="primary" >保存问卷</el-button>
+        <el-button type="primary" @click="saveForm">保存问卷</el-button>
       </el-footer>
     </el-container>
   </div>
@@ -152,25 +152,7 @@
           vetoId: 1,
           title: '标题',
           description: '描述',
-          subjects: [
-            {
-              id: 1,
-              title: '性别',
-              selectType: 'single',
-              required: false,
-              options: [
-                {
-                  id: 1,
-                  title: '男'
-                },
-                {
-                  id: 2,
-                  title: '女'
-                },
-              ],
-              answer: null
-            }
-          ]
+          subjects: []
         },
         edittingSubjectIndex: null,
         edittingSubject: null
@@ -189,7 +171,7 @@
               title: null
             }
           ],
-          answer: selectType === 'single' ? null : []
+          answer: selectType === 'single' ? window.JSON.stringify(null) : window.JSON.stringify([])
         })
         let index = this.vetoForm.subjects.length - 1
         this.editSubject(index,this.vetoForm.subjects[index])
@@ -208,7 +190,6 @@
       deleteSubject: function (index,subject) {
         if(this.edittingSubjectIndex === index) {
           this.edittingSubjectIndex = this.edittingSubject = null
-          return
         }
         let newSubjects = []
         this.vetoForm.subjects.forEach((sub,i) => {
@@ -253,6 +234,10 @@
         this.edittingSubject.options.push({
           title: ''
         })
+      },
+
+      saveForm: function () {
+        console.log(this.vetoForm)
       },
 
 
