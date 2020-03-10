@@ -37,6 +37,21 @@ export const constantRoutes = [
     hidden: true
   },
   {
+    path: '/veto',
+    component: () => import('@/views/veto/veto'),
+    hidden: true
+  },
+  {
+    path: '/design',
+    component: () => import('@/views/veto/design'),
+    hidden: true
+  },
+  {
+    path: '/statistic',
+    component: () => import('@/views/veto/statistic'),
+    hidden: true
+  },
+  {
     path: '/home',
     component: () => import('@/views/home/home'),
     hidden: true
@@ -46,7 +61,7 @@ export const constantRoutes = [
     component: () => import('@/views/login/register'),
     hidden: true
   },
-  
+
   {
     path: '/404',
     component: () => import('@/views/404'),
