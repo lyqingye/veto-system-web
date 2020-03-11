@@ -42,7 +42,7 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/design',
+    path: '/design/:vetoId',
     component: () => import('@/views/veto/design'),
     hidden: true
   },

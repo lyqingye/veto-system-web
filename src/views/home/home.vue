@@ -39,7 +39,7 @@
 
       <el-container style="margin-top: 48px;">
         <el-aside width="300px" style="margin-left: 10%;">
-          <el-button style="width: 245px;height: 60px; border: none;" icon="el-icon-edit" type="primary">创建问卷</el-button>
+          <el-button style="width: 245px;height: 60px; border: none;" icon="el-icon-edit" type="primary" @click="newVetoForm.isShow = true">创建问卷</el-button>
         </el-aside>
         <el-main style="margin-left: 48px; margin-right: 10%;padding: 0px;">
 
@@ -50,98 +50,182 @@
             <div style="float: right;margin-top: 10px;">
               <el-form :inline="true" class="demo-form-inline">
                 <el-form-item label="">
-                  <el-input placeholder="问卷" />
+                  <el-input v-model="keyword" placeholder="问卷" />
                 </el-form-item>
 
                 <el-form-item>
-                  <el-button icon="el-icon-search">搜索</el-button>
+                  <el-button icon="el-icon-search" @click="search">搜索</el-button>
                 </el-form-item>
               </el-form>
             </div>
           </el-row>
-          <el-row style="margin-bottom: 20px;">
+          <el-row v-for="veto in vetoList" :key="veto.vetoId" style="margin-bottom: 20px;">
             <el-col style="width: 99%;">
 
               <el-card class="box-card">
                 <div slot="header" class="clearfix">
-                  <span>投票标题</span>
+                  <span>{{ veto.title }}</span>
+
+                  <span style="float: right;margin-right: 5px;">
+                    <el-tag v-if="veto.isPublic" type="success">
+                      <span style="margin-left: 5px">已发布</span>
+                    </el-tag>
+                    <el-tag v-if="!veto.isPublic" type="info">
+                      <span style="margin-left: 5px">未发布</span>
+                    </el-tag>
+                  </span>
 
                   <span style="float: right;margin-right: 5px;">
                     <el-tag type="info"><i class="el-icon-time" />
-                      <span style="margin-left: 5px">2019-04-09 11:21:31</span>
+                      <span style="margin-left: 5px">{{ veto.createTime }}</span>
                     </el-tag>
                   </span>
                   <span style="float: right;margin-right: 5px;">
                     <el-tag type="info">
-                      <span style="margin-left: 5px">答卷人数:13131</span>
+                      <span style="margin-left: 5px">投票人数：{{ veto.vetoCount }}</span>
                     </el-tag>
                   </span>
 
                   <span style="float: right;margin-right: 5px;">
                     <el-tag type="info">
-                      <span style="margin-left: 5px">ID:13131</span>
+                      <span style="margin-left: 5px">ID:{{ veto.vetoId }}</span>
                     </el-tag>
                   </span>
 
                 </div>
                 <el-row style="float: right;margin-bottom: 16px;">
                   <el-button size="mini" icon="el-icon-share">分享</el-button>
-                  <el-button size="mini" icon="el-icon-edit">编辑</el-button>
-                  <el-button size="mini" icon="el-icon-upload">发布</el-button>
-                  <el-button size="mini" icon="el-icon-check">分析</el-button>
-                  <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
+                  <el-button size="mini" icon="el-icon-edit" :disabled="veto.isPublic" @click="editVetoForm(veto)">编辑</el-button>
+                  <el-button size="mini" icon="el-icon-upload" @click="publishVeto(veto)">发布</el-button>
+                  <el-button size="mini" icon="el-icon-check" :disabled="!veto.isPublic">分析</el-button>
+                  <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteVeto(veto)">删除</el-button>
                 </el-row>
               </el-card>
             </el-col>
           </el-row>
-
-          <el-row style="margin-bottom: 20px;">
-            <el-col style="width: 99%;">
-
-              <el-card class="box-card">
-                <div slot="header" class="clearfix">
-                  <span>投票标题</span>
-
-                  <span style="float: right;margin-right: 5px;">
-                    <el-tag type="info"><i class="el-icon-time" />
-                      <span style="margin-left: 5px">2019-04-09 11:21:31</span>
-                    </el-tag>
-                  </span>
-                  <span style="float: right;margin-right: 5px;">
-                    <el-tag type="info">
-                      <span style="margin-left: 5px">答卷人数:13131</span>
-                    </el-tag>
-                  </span>
-
-                  <span style="float: right;margin-right: 5px;">
-                    <el-tag type="info">
-                      <span style="margin-left: 5px">ID:13131</span>
-                    </el-tag>
-                  </span>
-
-                </div>
-                <el-row style="float: right;margin-bottom: 16px;">
-                  <el-button size="mini" icon="el-icon-share">分享</el-button>
-                  <el-button size="mini" icon="el-icon-edit">编辑</el-button>
-                  <el-button size="mini" icon="el-icon-upload">发布</el-button>
-                  <el-button size="mini" icon="el-icon-check">分析</el-button>
-                  <el-button size="mini" type="danger" icon="el-icon-delete">删除</el-button>
-                </el-row>
-              </el-card>
-            </el-col>
-          </el-row>
-
         </el-main>
       </el-container>
     </el-container>
+
+    <el-dialog title="创建问卷" modal :visible.sync="newVetoForm.isShow" width="25%">
+      <el-form>
+        <el-form-item label="问卷标题">
+          <el-input v-model="newVetoForm.formData.title" />
+        </el-form-item>
+
+        <el-form-item label="问卷描述">
+          <el-input v-model="newVetoForm.formData.description" type="textarea" />
+        </el-form-item>
+
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="newVetoForm.isShow = false">取 消</el-button>
+        <el-button type="primary" @click="createVetoForm">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-export default {
-  methods: {
+import { createVetoForm, deleteVetoForm, getEditVetoFormDetail, getVetoList, pulishVetoForm, getPublicVetoFormDetail, saveVetoForm, veto } from '@/api/veto'
 
+export default {
+  data() {
+    return {
+      keyword: '',
+      vetoList: null,
+      newVetoForm: {
+        isShow: false,
+        formData: {
+          title: null,
+          description: null
+        }
+      }
+    }
+  },
+  created() {
+    this.getVetoList()
+  },
+  methods: {
+    getVetoList: function() {
+      getVetoList(this.keyword).then(resp => {
+        if (resp.status === 0) {
+          this.vetoList = resp.data
+        } else {
+          this.$message(resp.message)
+        }
+      })
+    },
+    search() {
+      this.getVetoList()
+    },
+    publishVeto(data) {
+      this.$confirm('你确定要发布 ' + data.title + ' 问卷吗？', '警告', {
+        confirmButtonText: '发布',
+        cancelButtonText: '取消'
+      }).then(() => {
+        pulishVetoForm(data.vetoId).then(resp => {
+          if (resp.status === 0) {
+            this.$message({
+              message: '发布成功',
+              type: 'success'
+            })
+            this.search()
+          } else {
+            this.$message({
+              message: '发布失败',
+              type: 'error'
+            })
+          }
+        })
+      }).catch(() => {
+        // not do anything
+      })
+    },
+    createVetoForm() {
+      createVetoForm(this.newVetoForm.formData).then(resp => {
+        if (resp.status === 0) {
+          this.$message('创建成功')
+        } else {
+          this.$message('创建失败')
+        }
+        this.newVetoForm.isShow = false
+        this.search()
+      })
+    },
+    deleteVeto(data) {
+      this.$confirm('你确定要删除 ' + data.title + ' 问卷吗？', '警告', {
+        confirmButtonText: '删除',
+        cancelButtonText: '取消'
+      }).then(() => {
+        deleteVetoForm(data.vetoId).then(resp => {
+          if (resp.status === 0) {
+            this.$message({
+              message: '删除成功',
+              type: 'success'
+            })
+            this.search()
+          } else {
+            this.$message({
+              message: '删除失败',
+              type: 'error'
+            })
+          }
+        })
+      }).catch(() => {
+        // not do anything
+      })
+    },
+    editVetoForm(data) {
+      console.log(data)
+      this.$router.push({
+        path: `/design/${data.vetoId}`,
+        params: {
+          vetoId: data.vetoId
+        }
+      })
+    },
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)

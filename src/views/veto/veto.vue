@@ -2,30 +2,36 @@
   <div style="margin-left: 10%;margin-right:10%;">
     <el-header>
       <div style="text-align: center;width: 100%;">
-        <h2>{{vetoForm.title}}</h2>
+        <h2>{{ vetoForm.title }}</h2>
       </div>
 
-      <p>{{vetoForm.description}}</p>
+      <p>{{ vetoForm.description }}</p>
 
     </el-header>
     <el-main>
-      <el-divider></el-divider>
+      <el-divider />
 
       <el-row v-for="(subject,index) in vetoForm.subjects">
         <div><h4>
-        <span v-if="subject.required" style="color: red;">*</span>
-        {{index + 1}}. {{subject.title}}
-        <span v-if="subject.emptyAlert" style="color: red;float: right;">(该选项为必填)</span></h4>
+          <span v-if="subject.required" style="color: red;">*</span>
+          {{ index + 1 }}. {{ subject.title }}
+          <span v-if="subject.emptyAlert" style="color: red;float: right;">(该选项为必填)</span></h4>
         </div>
-         <el-checkbox-group v-model="subject.answer" v-if="subject.selectType === 'multiple'"
-         @change="subjectAlert(subject)">
-             <el-checkbox :label="option.id" v-for="option in subject.options">{{option.title}}</el-checkbox>
-         </el-checkbox-group>
+        <el-checkbox-group
+          v-if="subject.selectType === 'multiple'"
+          v-model="subject.answer"
+          @change="subjectAlert(subject)"
+        >
+          <el-checkbox v-for="option in subject.options" :label="option.id">{{ option.title }}</el-checkbox>
+        </el-checkbox-group>
 
-          <el-radio-group v-model="subject.answer" v-if="subject.selectType === 'single'"
-          @change="subjectAlert(subject)">
-             <el-radio :label="option.id" v-for="option in subject.options">{{option.title}}</el-radio>
-          </el-radio-group>
+        <el-radio-group
+          v-if="subject.selectType === 'single'"
+          v-model="subject.answer"
+          @change="subjectAlert(subject)"
+        >
+          <el-radio v-for="option in subject.options" :label="option.id">{{ option.title }}</el-radio>
+        </el-radio-group>
       </el-row>
     </el-main>
 
@@ -37,6 +43,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { createVetoForm, deleteVetoForm, getEditVetoFormDetail, getVetoList, pulishVetoForm, getPublicVetoFormDetail, saveVetoForm, veto } from '@/api/veto'
 export default {
   data() {
     return {
@@ -60,7 +67,7 @@ export default {
               {
                 id: 2,
                 title: '女'
-              },
+              }
             ],
             answer: null
           },
@@ -78,7 +85,7 @@ export default {
               {
                 id: 4,
                 title: '女1'
-              },
+              }
             ],
             answer: []
           }
@@ -88,16 +95,16 @@ export default {
   },
   methods: {
     subjectAlert: function(subject) {
-      if(subject.selectType === 'single') {
-        if(subject.required) {
+      if (subject.selectType === 'single') {
+        if (subject.required) {
           subject.emptyAlert = false
         }
       }
-      if(subject.selectType === 'multiple') {
-        if(subject.required) {
-          if(subject.answer.length === 0) {
+      if (subject.selectType === 'multiple') {
+        if (subject.required) {
+          if (subject.answer.length === 0) {
             subject.emptyAlert = true
-          }else {
+          } else {
             subject.emptyAlert = false
           }
         }
@@ -106,17 +113,16 @@ export default {
 
     vetoFormRequireCheck: function() {
       let result = true
-      this.vetoForm.subjects.forEach((subject,index) => {
-
-        if(subject.required) {
-          if(subject.selectType === 'single'){
-            if(subject.answer == null) {
+      this.vetoForm.subjects.forEach((subject, index) => {
+        if (subject.required) {
+          if (subject.selectType === 'single') {
+            if (subject.answer == null) {
               subject.emptyAlert = true
               result = false
             }
           }
-          if(subject.selectType === 'multiple'){
-            if(subject.answer.length === 0) {
+          if (subject.selectType === 'multiple') {
+            if (subject.answer.length === 0) {
               subject.emptyAlert = true
               result = false
             }
@@ -124,28 +130,28 @@ export default {
         }
       })
       console.log(result)
-      return result;
+      return result
     },
 
     submit: function() {
-      if(!this.vetoFormRequireCheck()) {
+      if (!this.vetoFormRequireCheck()) {
         this.$message('你还有未填写的选项，请继续填写')
-        return;
+        return
       }
       var submitData = {
         vetoId: this.vetoForm.vetoId,
         answers: []
       }
-      this.vetoForm.subjects.forEach((subject,index) => {
-        let subjectAnswer = {
+      this.vetoForm.subjects.forEach((subject, index) => {
+        const subjectAnswer = {
           id: subject.id,
           answer: []
         }
 
-        if(subject.selectType === 'single' && subject.answer != null) {
+        if (subject.selectType === 'single' && subject.answer != null) {
           subjectAnswer.answer.push(subject.answer)
         }
-        if(subject.selectType === 'multiple') {
+        if (subject.selectType === 'multiple') {
           subjectAnswer.answer = subject.answer
         }
         submitData.answers.push(subjectAnswer)

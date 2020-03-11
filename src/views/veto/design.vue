@@ -1,9 +1,11 @@
 <template>
   <div>
     <el-container>
-      <el-header style="vertical-align: middle;
+      <el-header
+        style="vertical-align: middle;
     line-height: 60px;
-    box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.12), 0px 1px 0px 0px rgba(232, 232, 232, 1);">
+    box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.12), 0px 1px 0px 0px rgba(232, 232, 232, 1);"
+      >
         <el-row>
           <div style="vertical-align: middle;float: left;">
             <img class="logo" src="https://www.wjx.cn/images/commonImgPC/logo@2x.png">
@@ -49,12 +51,12 @@
             </div>
             <div>
               <el-radio>单选框</el-radio>
-              <el-button @click="addSubject('single')" size="mini" style="float: right;padding: 2px 4px;">+</el-button>
+              <el-button size="mini" style="float: right;padding: 2px 4px;" @click="addSubject('single')">+</el-button>
             </div>
-            <el-divider></el-divider>
+            <el-divider />
             <div>
               <el-checkbox :checked="true">多选框</el-checkbox>
-              <el-button @click="addSubject('multiple')" size="mini" style="float: right;padding: 2px 4px;">+</el-button>
+              <el-button size="mini" style="float: right;padding: 2px 4px;" @click="addSubject('multiple')">+</el-button>
             </div>
 
           </el-card>
@@ -64,23 +66,35 @@
               <span>属性编辑</span>
             </div>
             <div>
-              <el-form ref="form" size="mini" v-if="edittingSubject != null" >
+              <el-form v-if="edittingSubject != null" ref="form" size="mini">
                 <el-form-item label="标题">
-                  <el-input size="mini" v-model="edittingSubject.title"></el-input>
+                  <el-input v-model="edittingSubject.title" size="mini" />
                 </el-form-item>
 
                 <el-form-item label="必填">
-                  <el-checkbox v-model="edittingSubject.required"></el-checkbox>
+                  <el-checkbox v-model="edittingSubject.required" />
 
                 </el-form-item>
-                <el-form-item label="选项" >
+                <el-form-item label="选项">
                   <br>
-                  <el-row style="margin-top: 10px;" v-for="(option,index) in edittingSubject.options">
-                    <el-input style="width: 75%;" v-model="option.title"></el-input>
-                    <el-button @click="deleteOption(index,option)" style="padding: 1px;float: right;margin-top: 6px;margin-left: 5px;" type="danger" icon="el-icon-minus"
-                      size="small" circle></el-button>
-                    <el-button @click="addOption" style="padding: 1px;float: right;margin-top: 6px;margin-right: 5px;" type="success" icon="el-icon-plus"
-                      size="small" circle></el-button>
+                  <el-row v-for="(option,index) in edittingSubject.options" :key="index" style="margin-top: 10px;">
+                    <el-input v-model="option.title" style="width: 75%;" />
+                    <el-button
+                      style="padding: 1px;float: right;margin-top: 6px;margin-left: 5px;"
+                      type="danger"
+                      icon="el-icon-minus"
+                      size="small"
+                      circle
+                      @click="deleteOption(index,option)"
+                    />
+                    <el-button
+                      style="padding: 1px;float: right;margin-top: 6px;margin-right: 5px;"
+                      type="success"
+                      icon="el-icon-plus"
+                      size="small"
+                      circle
+                      @click="addOption"
+                    />
                   </el-row>
 
                 </el-form-item>
@@ -96,45 +110,50 @@
               <h2>问卷预览</h2>
             </div>
           </el-row>
-          <el-row style="margin-bottom: 20px;">
+          <el-row v-if="vetoForm != null" style="margin-bottom: 20px;">
             <el-col style="width: 99%;">
-              <el-header>
-                <div style="text-align: center;width: 100%;">
-                  <h2>{{vetoForm.title}}</h2>
+              <el-header style="box-shadow: none">
+                <div style="text-align: center;width: 100%;line-height: 30px;">
+                  <h2>{{ vetoForm.title }}</h2>
                 </div>
-                <p>{{vetoForm.description}}</p>
+                <p>{{ vetoForm.description }}</p>
               </el-header>
-              <el-main>
-                <el-divider></el-divider>
 
-                <el-row v-for="(subject,index) in vetoForm.subjects" :class="index === edittingSubjectIndex ? 'subject-editting' : null">
-                  <div><h4>
-                  <span v-if="subject.required" style="color: red;">*</span>
-                  {{index + 1}}. {{subject.title}}
-                  </h4>
+              <el-main v-if="vetoForm.subjects !== null && vetoForm.subjects.length != 0">
+                <el-divider />
+
+                <el-row v-for="(subject,index) in vetoForm.subjects" :key="index" :class="index === edittingSubjectIndex ? 'subject-editting' : null">
+                  <div>
+                    <h4>
+                      <span v-if="subject.required" style="color: red;">*</span>
+                      {{ index + 1 }}. {{ subject.title }}
+                    </h4>
                   </div>
                   <div style="float: right;width: ;">
-                    <el-button @click="moveSubjectToLast(index)" size="mini" :disabled="edittingSubjectIndex != index || index === 0">⬆ 上移</el-button>
-                    <el-button @click="moveSubjectToNext(index)" size="mini" :disabled="edittingSubjectIndex != index || index === vetoForm.subjects.length - 1">⬇ 下移</el-button>
+                    <el-button size="mini" :disabled="edittingSubjectIndex != index || index === 0" @click="moveSubjectToLast(index)">⬆
+                      上移</el-button>
+                    <el-button
+                      size="mini"
+                      :disabled="edittingSubjectIndex != index || index === vetoForm.subjects.length - 1"
+                      @click="moveSubjectToNext(index)"
+                    >⬇ 下移</el-button>
                     <el-button size="mini" @click="editSubject(index,subject)">编辑</el-button>
-                    <el-button size="mini" @click="deleteSubject(index,subject)" :disabled="edittingSubjectIndex != index">删除</el-button>
+                    <el-button size="mini" :disabled="edittingSubjectIndex != index" @click="deleteSubject(index,subject)">删除</el-button>
                   </div>
-                   <el-checkbox-group  v-if="subject.selectType === 'multiple'"
-                   @change="subjectAlert(subject)">
-                       <el-checkbox :label="opIndex" v-for="(option,opIndex) in subject.options">{{option.title}}</el-checkbox>
-                   </el-checkbox-group>
+                  <el-checkbox-group v-if="subject.selectType === 'multiple'" @change="subjectAlert(subject)">
+                    <el-checkbox v-for="(option,opIndex) in subject.options" :key="opIndex" :label="opIndex">{{ option.title }}</el-checkbox>
+                  </el-checkbox-group>
 
-                    <el-radio-group  v-if="subject.selectType === 'single'"
-                    @change="subjectAlert(subject)">
-                       <el-radio :label="opIndex" v-for="(option,opIndex) in subject.options">{{option.title}}</el-radio>
-                    </el-radio-group>
+                  <el-radio-group v-if="subject.selectType === 'single'" @change="subjectAlert(subject)">
+                    <el-radio v-for="(option,opIndex) in subject.options" :key="opIndex" :label="opIndex">{{ option.title }}</el-radio>
+                  </el-radio-group>
                 </el-row>
               </el-main>
             </el-col>
           </el-row>
         </el-main>
       </el-container>
-      <el-footer style="text-align: right; margin-top: 0%;">
+      <el-footer style="text-align: right; margin-top: 0%;box-shadow: none;">
         <el-button type="primary" @click="saveForm">保存问卷</el-button>
       </el-footer>
     </el-container>
@@ -142,111 +161,133 @@
 </template>
 
 <script>
-  import {
-    mapGetters
-  } from 'vuex'
-  export default {
-    data() {
-      return {
-        vetoForm: {
-          vetoId: 1,
-          title: '标题',
-          description: '描述',
-          subjects: []
-        },
-        edittingSubjectIndex: null,
-        edittingSubject: null
+import {
+  mapGetters
+} from 'vuex'
+
+import {
+  createVetoForm,
+  deleteVetoForm,
+  getEditVetoFormDetail,
+  getVetoList,
+  pulishVetoForm,
+  getPublicVetoFormDetail,
+  saveVetoForm,
+  veto
+} from '@/api/veto'
+
+export default {
+  data() {
+    return {
+      vetoForm: null,
+      edittingSubjectIndex: null,
+      edittingSubject: null
+    }
+  },
+  created() {
+    getEditVetoFormDetail(this.$route.params.vetoId).then(resp => {
+      if (resp.status === 0) {
+        this.vetoForm = resp.data
+      } else {
+        this.$message(resp.message)
+      }
+    })
+  },
+  methods: {
+    addSubject: function(selectType) {
+      this.vetoForm.subjects.push({
+        id: null,
+        title: '',
+        selectType: selectType,
+        required: false,
+        emptyAlert: false,
+        options: [{
+          id: null,
+          title: ''
+        }],
+        answer: selectType === 'single' ? 'null' : '[]'
+      })
+
+      const index = this.vetoForm.subjects.length - 1
+      this.editSubject(index, this.vetoForm.subjects[index])
+    },
+
+    editSubject: function(index, subject) {
+      if (this.edittingSubjectIndex === index) {
+        this.edittingSubject = null
+        this.edittingSubjectIndex = null
+        return
+      }
+      this.edittingSubjectIndex = index
+      this.edittingSubject = subject
+    },
+
+    deleteSubject: function(index, subject) {
+      if (this.edittingSubjectIndex === index) {
+        this.edittingSubjectIndex = this.edittingSubject = null
+      }
+      const newSubjects = []
+      this.vetoForm.subjects.forEach((sub, i) => {
+        if (index !== i) {
+          newSubjects.push(sub)
+        }
+      })
+      this.vetoForm.subjects = newSubjects
+    },
+
+    moveSubjectToLast: function(index) {
+      if (this.edittingSubjectIndex === index) {
+        const curr = this.vetoForm.subjects[index]
+        this.vetoForm.subjects[index] = this.vetoForm.subjects[index - 1]
+        this.vetoForm.subjects[index - 1] = curr
+        this.edittingSubject = curr
+        this.edittingSubjectIndex = index - 1
       }
     },
-    methods: {
-      addSubject: function (selectType) {
-        this.vetoForm.subjects.push({
-          id: null,
-          title: '',
-          selectType: selectType,
-          required: false,
-          options: [
-            {
-              id: null,
-              title: null
-            }
-          ],
-          answer: selectType === 'single' ? window.JSON.stringify(null) : window.JSON.stringify([])
-        })
-        let index = this.vetoForm.subjects.length - 1
-        this.editSubject(index,this.vetoForm.subjects[index])
-      },
 
-      editSubject: function (index,subject) {
-        if(this.edittingSubjectIndex === index) {
-          this.edittingSubject = null
-          this.edittingSubjectIndex = null
-          return
-        }
-        this.edittingSubjectIndex = index
-        this.edittingSubject = subject
-      },
-
-      deleteSubject: function (index,subject) {
-        if(this.edittingSubjectIndex === index) {
-          this.edittingSubjectIndex = this.edittingSubject = null
-        }
-        let newSubjects = []
-        this.vetoForm.subjects.forEach((sub,i) => {
-          if(index != i) {
-            newSubjects.push(sub)
-          }
-        })
-        this.vetoForm.subjects = newSubjects
-      },
-
-      moveSubjectToLast: function (index) {
-        if(this.edittingSubjectIndex == index) {
-          let curr = this.vetoForm.subjects[index]
-          this.vetoForm.subjects[index] = this.vetoForm.subjects[index - 1]
-          this.vetoForm.subjects[index - 1] = curr
-          this.edittingSubject = curr
-          this.edittingSubjectIndex = index - 1
-        }
-      },
-
-      moveSubjectToNext: function (index) {
-        if(this.edittingSubjectIndex == index) {
-          let curr = this.vetoForm.subjects[index]
-          this.vetoForm.subjects[index] = this.vetoForm.subjects[index + 1]
-          this.vetoForm.subjects[index + 1] = curr
-          this.edittingSubject = curr
-          this.edittingSubjectIndex = index + 1
-        }
-      },
-
-      deleteOption: function (index,option) {
-        let newOptions = []
-        this.edittingSubject.options.forEach((op,i) => {
-          if(index != i) {
-            newOptions.push(op)
-          }
-        })
-        this.edittingSubject.options = newOptions
-      },
-
-      addOption: function () {
-        this.edittingSubject.options.push({
-          title: ''
-        })
-      },
-
-      saveForm: function () {
-        console.log(this.vetoForm)
-      },
-
-
-      async logout() {
-        await this.$store.dispatch('user/logout')
-        this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+    moveSubjectToNext: function(index) {
+      if (this.edittingSubjectIndex === index) {
+        const curr = this.vetoForm.subjects[index]
+        this.vetoForm.subjects[index] = this.vetoForm.subjects[index + 1]
+        this.vetoForm.subjects[index + 1] = curr
+        this.edittingSubject = curr
+        this.edittingSubjectIndex = index + 1
       }
+    },
+
+    deleteOption: function(index, option) {
+      const newOptions = []
+      this.edittingSubject.options.forEach((op, i) => {
+        if (index !== i) {
+          newOptions.push(op)
+        }
+      })
+      this.edittingSubject.options = newOptions
+    },
+
+    addOption: function() {
+      this.edittingSubject.options.push({
+        title: ''
+      })
+    },
+
+    saveForm: function() {
+      console.log(this.vetoForm)
+      saveVetoForm(this.vetoForm).then(resp => {
+        if (resp.status === 0) {
+          this.$message('保存成功')
+        } else {
+          this.$message('保存失败')
+        }
+      })
+    },
+
+    async logout() {
+      await this.$store.dispatch('user/logout')
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
     }
   }
+}
 </script>
 
 <style>
@@ -254,8 +295,6 @@
     border: #409EFF 1px solid;
     padding: 5px;
   }
-
-
 
   .el-header .logo {
     float: left;
