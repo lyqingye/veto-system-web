@@ -1,55 +1,49 @@
 <template>
   <div style="margin-left: 10%;margin-right:10%;">
-    <el-header>
-      <div style="text-align: center;width: 100%;">
-        <h2>大学生就业问卷调查表</h2>
+    <el-header style="box-shadow: none;">
+      <div style="text-align: center;width: 100%;line-height: 30px;">
+        <h2>{{ statistic.title }}</h2>
       </div>
 
-      <p>感谢您在百忙之中参与我们的调查，问卷按照真实情况填写即可，没有正确答案。 本次调查只用于统计和分析，不会泄露你的信息，请您放心。谢谢配合</p>
+      <p style="line-height: 20px;">{{ statistic.description }}</p>
 
     </el-header>
     <el-main>
-      <el-divider></el-divider>
-      <el-row>
-        <div><h4>1. 性别</h4> </div>
+      <el-divider />
+      <el-row v-for="(subject,index) in statistic.subjects">
+        <div><h4>{{index + 1}}.{{subject.title}} </h4> </div>
         <el-table
-            :data="tableData"
-            style="width: 100%"
-            >
-            <el-table-column
-              prop="date"
-              label="选项名"
+          :data="subject.options"
+          style="width: 100%"
+        >
+          <el-table-column
+            prop="title"
+            label="选项名"
 
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="name"
-              label="票数"
+            width="180"
+          />
+          <el-table-column
+            prop="vetoCount"
+            label="票数"
 
-              width="180">
-            </el-table-column>
-            <el-table-column
-              prop="address"
-              label="占比"
-              width="200px"
-              >
-              <el-progress percentage="50"></el-progress>
-            </el-table-column>
-          </el-table>
+            width="180"
+          />
+          <el-table-column
+            prop="proportion"
+            label="占比"
+            width="200px"
+          >
+          <template slot-scope="scope">
+                  <el-progress :percentage="scope.row.proportion" />
+          </template>
+          </el-table-column>
+        </el-table>
 
       </el-row>
-      <el-row>
-        <div><h4>2. 多选</h4>
-        </div>
-         <el-checkbox-group v-model="checkList">
-             <el-checkbox label="复选框 A"></el-checkbox>
-             <el-checkbox label="复选框 B"></el-checkbox>
-             <el-checkbox label="复选框 C"></el-checkbox>
-         </el-checkbox-group>
-      </el-row>
+
     </el-main>
 
-    <el-footer style="text-align: right; margin-top: 10%;">
+    <el-footer style="text-align: right; margin-top: 10%;box-shadow: none;">
       <el-button type="primary">提交问卷</el-button>
     </el-footer>
   </div>
@@ -57,32 +51,43 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { getVetoFormStatistic } from '@/api/veto'
 export default {
   data() {
     return {
+      statistic: null,
+
       radio: true,
       checkList: [],
-tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
-        }]
+      tableData: [{
+        date: '2016-05-02',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        date: '2016-05-04',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1517 弄'
+      }, {
+        date: '2016-05-01',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1519 弄'
+      }, {
+        date: '2016-05-03',
+        name: '王小虎',
+        address: '上海市普陀区金沙江路 1516 弄'
+      }]
     }
   },
+  mounted() {
+    getVetoFormStatistic(this.$route.params.vetoId).then(resp => {
+      if (resp.status === 0) {
+        this.statistic = resp.data
+      } else {
+        this.$message(resp.message)
+      }
+    })
+  },
   methods: {
-
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)

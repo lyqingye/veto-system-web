@@ -91,13 +91,12 @@
                       <span style="margin-left: 5px">ID:{{ veto.vetoId }}</span>
                     </el-tag>
                   </span>
-
                 </div>
                 <el-row style="float: right;margin-bottom: 16px;">
                   <el-button size="mini" icon="el-icon-share">分享</el-button>
                   <el-button size="mini" icon="el-icon-edit" :disabled="veto.isPublic" @click="editVetoForm(veto)">编辑</el-button>
-                  <el-button size="mini" icon="el-icon-upload" @click="publishVeto(veto)">发布</el-button>
-                  <el-button size="mini" icon="el-icon-check" :disabled="!veto.isPublic">分析</el-button>
+                  <el-button size="mini" icon="el-icon-upload" :disabled="veto.isPublic" @click="publishVeto(veto)">发布</el-button>
+                  <el-button size="mini" icon="el-icon-check" @click="statisticVetoForm(veto)" :disabled="!veto.isPublic">分析</el-button>
                   <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteVeto(veto)">删除</el-button>
                 </el-row>
               </el-card>
@@ -221,6 +220,14 @@ export default {
       console.log(data)
       this.$router.push({
         path: `/design/${data.vetoId}`,
+        params: {
+          vetoId: data.vetoId
+        }
+      })
+    },
+    statisticVetoForm(data) {
+      this.$router.push({
+        path: `/statistic/${data.vetoId}`,
         params: {
           vetoId: data.vetoId
         }

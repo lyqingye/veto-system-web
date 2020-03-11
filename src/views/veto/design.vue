@@ -116,7 +116,7 @@
                 <div style="text-align: center;width: 100%;line-height: 30px;">
                   <h2>{{ vetoForm.title }}</h2>
                 </div>
-                <p>{{ vetoForm.description }}</p>
+                <p style="line-height: 20px;">{{ vetoForm.description }}</p>
               </el-header>
 
               <el-main v-if="vetoForm.subjects !== null && vetoForm.subjects.length != 0">

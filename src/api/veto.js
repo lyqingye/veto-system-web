@@ -58,3 +58,10 @@ export function veto(data) {
     data
   })
 }
+
+export function getVetoFormStatistic(vetoFormId) {
+  return request({
+    url: '/api/web/veto/statistic/' + vetoFormId,
+    method: 'get'
+  })
+}

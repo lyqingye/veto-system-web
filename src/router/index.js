@@ -37,7 +37,7 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/veto',
+    path: '/veto/:vetoId',
     component: () => import('@/views/veto/veto'),
     hidden: true
   },
@@ -47,7 +47,7 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    path: '/statistic',
+    path: '/statistic/:vetoId',
     component: () => import('@/views/veto/statistic'),
     hidden: true
   },

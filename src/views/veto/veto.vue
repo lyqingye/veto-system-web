@@ -1,11 +1,11 @@
 <template>
-  <div style="margin-left: 10%;margin-right:10%;">
-    <el-header>
-      <div style="text-align: center;width: 100%;">
+  <div style="margin-left: 10%;margin-right:10%;" v-if="vetoForm != null">
+    <el-header style="box-shadow: none;">
+      <div style="text-align: center;width: 100%;line-height: 30px;">
         <h2>{{ vetoForm.title }}</h2>
       </div>
 
-      <p>{{ vetoForm.description }}</p>
+      <p style="line-height: 20px;">{{ vetoForm.description }}</p>
 
     </el-header>
     <el-main>
@@ -35,7 +35,7 @@
       </el-row>
     </el-main>
 
-    <el-footer style="text-align: right; margin-top: 10%;">
+    <el-footer style="text-align: right; margin-top: 10%;box-shadow: none;">
       <el-button type="primary" @click="submit">提交问卷</el-button>
     </el-footer>
   </div>
@@ -47,51 +47,20 @@ import { createVetoForm, deleteVetoForm, getEditVetoFormDetail, getVetoList, pul
 export default {
   data() {
     return {
-      vetoForm: {
-        vetoId: 1,
-        title: '大学生就业问卷调查表',
-        description: '感谢您在百忙之中参与我们的调查',
-        createTime: '2016-10-09',
-        subjects: [
-          {
-            id: 1,
-            title: '性别',
-            selectType: 'single',
-            required: false,
-            emptyAlert: false,
-            options: [
-              {
-                id: 1,
-                title: '男'
-              },
-              {
-                id: 2,
-                title: '女'
-              }
-            ],
-            answer: null
-          },
-          {
-            id: 2,
-            title: '多选测试',
-            selectType: 'multiple',
-            required: true,
-            emptyAlert: false,
-            options: [
-              {
-                id: 3,
-                title: '男1'
-              },
-              {
-                id: 4,
-                title: '女1'
-              }
-            ],
-            answer: []
-          }
-        ]
-      }
+      vetoForm: null
     }
+  },
+  mounted() {
+    getPublicVetoFormDetail(this.$route.params.vetoId).then(resp => {
+      if (resp.status === 0) {
+        this.vetoForm = resp.data
+        this.vetoForm.subjects.forEach((subject) => {
+          subject.answer = JSON.parse(subject.answer)
+        })
+      } else {
+        this.$message(resp.message)
+      }
+    })
   },
   methods: {
     subjectAlert: function(subject) {
@@ -155,6 +124,13 @@ export default {
           subjectAnswer.answer = subject.answer
         }
         submitData.answers.push(subjectAnswer)
+      })
+      veto(submitData).then(resp => {
+        if (resp.status === 0) {
+          this.$message('投票成功')
+        } else {
+          this.$message(resp.message)
+        }
       })
       console.log(submitData)
     },
