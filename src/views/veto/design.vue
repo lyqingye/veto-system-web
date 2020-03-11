@@ -129,7 +129,7 @@
                       {{ index + 1 }}. {{ subject.title }}
                     </h4>
                   </div>
-                  <div style="float: right;width: ;">
+                  <div style="float: right">
                     <el-button size="mini" :disabled="edittingSubjectIndex != index || index === 0" @click="moveSubjectToLast(index)">⬆
                       上移</el-button>
                     <el-button
@@ -140,11 +140,11 @@
                     <el-button size="mini" @click="editSubject(index,subject)">编辑</el-button>
                     <el-button size="mini" :disabled="edittingSubjectIndex != index" @click="deleteSubject(index,subject)">删除</el-button>
                   </div>
-                  <el-checkbox-group v-if="subject.selectType === 'multiple'" @change="subjectAlert(subject)">
+                  <el-checkbox-group v-if="subject.selectType === 'multiple'" v-model="multipleData">
                     <el-checkbox v-for="(option,opIndex) in subject.options" :key="opIndex" :label="opIndex">{{ option.title }}</el-checkbox>
                   </el-checkbox-group>
 
-                  <el-radio-group v-if="subject.selectType === 'single'" @change="subjectAlert(subject)">
+                  <el-radio-group v-if="subject.selectType === 'single'">
                     <el-radio v-for="(option,opIndex) in subject.options" :key="opIndex" :label="opIndex">{{ option.title }}</el-radio>
                   </el-radio-group>
                 </el-row>
@@ -181,7 +181,9 @@ export default {
     return {
       vetoForm: null,
       edittingSubjectIndex: null,
-      edittingSubject: null
+      edittingSubject: null,
+      singleData: null,
+      multipleData: []
     }
   },
   created() {
@@ -272,7 +274,6 @@ export default {
     },
 
     saveForm: function() {
-      console.log(this.vetoForm)
       saveVetoForm(this.vetoForm).then(resp => {
         if (resp.status === 0) {
           this.$message('保存成功')
