@@ -20,7 +20,7 @@
                   </el-col>
                   <el-col :span="12">
                     <div style="float: right;margin-left: 2px;">
-                      <span><i class="el-icon-caret-bottom">lyqingye</i></span>
+                      <span><i class="el-icon-caret-bottom">{{name}}</i></span>
                     </div>
                   </el-col>
                 </el-row>
@@ -177,6 +177,11 @@ import {
 } from '@/api/veto'
 
 export default {
+  computed: {
+    ...mapGetters([
+      'name'
+    ])
+  },
   data() {
     return {
       vetoForm: null,

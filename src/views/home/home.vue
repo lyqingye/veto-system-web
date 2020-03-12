@@ -16,7 +16,7 @@
                   </el-col>
                   <el-col :span="12">
                     <div style="float: right;margin-left: 2px;">
-                      <span><i class="el-icon-caret-bottom">lyqingye</i></span>
+                      <span><i class="el-icon-caret-bottom">{{name}}</i></span>
                     </div>
                   </el-col>
                 </el-row>
@@ -93,7 +93,7 @@
                   </span>
                 </div>
                 <el-row style="float: right;margin-bottom: 16px;">
-                  <el-button size="mini" icon="el-icon-share">分享</el-button>
+                  <el-button size="mini" @click="shareUrl(veto)" :disabled="!veto.isPublic" icon="el-icon-share">分享</el-button>
                   <el-button size="mini" icon="el-icon-edit" :disabled="veto.isPublic" @click="editVetoForm(veto)">编辑</el-button>
                   <el-button size="mini" icon="el-icon-upload" :disabled="veto.isPublic" @click="publishVeto(veto)">发布</el-button>
                   <el-button size="mini" icon="el-icon-check" @click="statisticVetoForm(veto)" :disabled="!veto.isPublic">分析</el-button>
@@ -130,6 +130,11 @@ import { mapGetters } from 'vuex'
 import { createVetoForm, deleteVetoForm, getEditVetoFormDetail, getVetoList, pulishVetoForm, getPublicVetoFormDetail, saveVetoForm, veto } from '@/api/veto'
 
 export default {
+  computed: {
+    ...mapGetters([
+      'name'
+    ])
+  },
   data() {
     return {
       keyword: '',
@@ -228,6 +233,14 @@ export default {
     statisticVetoForm(data) {
       this.$router.push({
         path: `/statistic/${data.vetoId}`,
+        params: {
+          vetoId: data.vetoId
+        }
+      })
+    },
+    shareUrl(data) {
+      this.$router.push({
+        path: `/veto/${data.vetoId}`,
         params: {
           vetoId: data.vetoId
         }
