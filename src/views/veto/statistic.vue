@@ -11,7 +11,7 @@
     <el-main>
       <el-divider />
       <el-row v-for="(subject,index) in statistic.subjects">
-        <div><h4>{{index + 1}}.{{subject.title}} </h4> </div>
+        <div><h4>{{ index + 1 }}.{{ subject.title }} </h4> </div>
         <el-table
           :data="subject.options"
           style="width: 100%"
@@ -33,9 +33,9 @@
             label="占比"
             width="200px"
           >
-          <template slot-scope="scope">
-                  <el-progress :percentage="scope.row.proportion" />
-          </template>
+            <template slot-scope="scope">
+              <el-progress :percentage="scope.row.proportion" />
+            </template>
           </el-table-column>
         </el-table>
 
@@ -43,9 +43,6 @@
 
     </el-main>
 
-    <el-footer style="text-align: right; margin-top: 10%;box-shadow: none;">
-      <el-button type="primary">提交问卷</el-button>
-    </el-footer>
   </div>
 </template>
 
