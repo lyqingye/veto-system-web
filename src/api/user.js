@@ -45,3 +45,18 @@ export function sendRegisterVerifyCode(mobile) {
     method: 'get'
   })
 }
+
+export function sendResetLoginPwVerifyCode(mobile) {
+  return request({
+    url: '/api/web/member/sms/sendResetLoginPwVerifyCode/' + mobile,
+    method: 'get'
+  })
+}
+
+export function resetLoginPassword(data) {
+  return request({
+    url: '/api/web/member/resetLoginPassword',
+    method: 'post',
+    data
+  })
+}
