@@ -8,7 +8,7 @@
       >
         <el-row>
           <div style="vertical-align: middle;float: left;">
-            <img class="logo" src="https://www.wjx.cn/images/commonImgPC/logo@2x.png">
+            <img class="logo" src="https://img95.699pic.com/xsj/0t/x8/64.jpg!/fw/700/watermark/url/L3hzai93YXRlcl9kZXRhaWwyLnBuZw/align/southeast">
             投票系统
           </div>
           <div style="float: right;margin-top: 10px;">

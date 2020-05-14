@@ -16,6 +16,15 @@ export function register(data) {
   })
 }
 
+
+export function changeLoginPassword(data) {
+  return request({
+    url: '/api/web/member/changeLoginPassword',
+    method: 'post',
+    data
+  })
+}
+
 export function getInfo(token) {
   return request({
     url: '/api/web/member/getLoginUserInfo',

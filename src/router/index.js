@@ -49,7 +49,7 @@ export const constantRoutes = [
     hidden: true
   },
   {
-    
+
     path: '/statistic/:vetoId',
     component: () => import('@/views/veto/statistic'),
     hidden: true
